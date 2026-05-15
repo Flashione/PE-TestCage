@@ -6,6 +6,9 @@ Logs/*
 Temp/*
 !Temp/.gitkeep
 
+# Local Wine prefix
+.wineprefix/
+
 # Local tool copies / fake drive content
 Drives/S/*
 !Drives/S/.gitkeep
