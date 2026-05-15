@@ -2,7 +2,7 @@
 
 PE-TestCage is a safe local test cage for Windows PE and Windows deployment scripts.
 
-It allows batch-based deployment menus to be tested from a running Windows system without touching real disks, bootloaders or images.
+It allows batch-based deployment menus to be tested without touching real disks, bootloaders or images.
 
 The cage works by placing mock commands before the real Windows tools in `PATH`.
 
@@ -24,8 +24,8 @@ This makes it possible to test menu structure, path handling, module calls, conf
 - A safe test wrapper for WinPE-style batch scripts
 - A mock environment for deployment menus
 - A way to test menu logic without booting WinPE
-- Useful for DP-Menu-Bat, WimTools and similar tools
 - A fast local preview environment for menu layout and script flow
+- Tool-agnostic by design
 
 ## What PE-TestCage is not
 
@@ -84,8 +84,7 @@ The tested scripts can stay unchanged. They call `diskpart`, `dism` or `bcdboot`
 ```text
 PE-TestCage\
 ├── Run-TestCage.cmd
-├── profiles\
-│   └── dp-menu.cmd
+├── Run-TestCage.sh
 ├── MockBin\
 │   ├── diskpart.cmd
 │   ├── dism.cmd
@@ -102,42 +101,88 @@ PE-TestCage\
 ├── Logs\
 └── examples\
     ├── Disklayouts\
-    └── Images\
+    ├── Images\
+    └── hello-menu.cmd
 ```
 
 ## Drive model
 
-The default test cage uses `subst` to map local folders to fake deployment drives:
+The default test cage exposes fake deployment drives:
 
 ```text
 S: = fake EFI/System partition
 W: = fake Windows target partition
 Z: = fake deployment share / tool drive
+P: = PE-TestCage repository root, Linux/Wine runner only
 ```
 
-The mappings are temporary and are removed when the runner exits.
+On Windows, `Run-TestCage.cmd` uses `subst` for `S:`, `W:` and `Z:`.
 
-## Usage
+On Linux, `Run-TestCage.sh` uses a local Wine prefix and creates Wine drive mappings through `dosdevices`.
 
-Prepare your tool inside the fake `Z:` drive folder, for example:
+## Windows usage
 
-```text
-Drives\Z\DP-Menu-Bat\
-```
-
-Then run:
-
-```cmd
-Run-TestCage.cmd profiles\dp-menu.cmd
-```
-
-Or simply:
+Start an interactive cage shell:
 
 ```cmd
 Run-TestCage.cmd
 ```
 
-The default profile is `profiles\dp-menu.cmd`.
+Run a script inside the cage:
+
+```cmd
+Run-TestCage.cmd Z:\MyTool\Menu.cmd
+```
+
+Or run an example:
+
+```cmd
+Run-TestCage.cmd examples\hello-menu.cmd
+```
+
+Relative paths are resolved from the PE-TestCage repository root.
+
+## Linux usage
+
+Install Wine through your distribution package manager.
+
+Fedora example:
+
+```bash
+sudo dnf install wine
+```
+
+Arch example:
+
+```bash
+sudo pacman -S wine
+```
+
+Start an interactive cage shell:
+
+```bash
+./Run-TestCage.sh
+```
+
+Run a script inside the cage:
+
+```bash
+./Run-TestCage.sh 'Z:\MyTool\Menu.cmd'
+```
+
+Run the example:
+
+```bash
+./Run-TestCage.sh examples/hello-menu.cmd
+```
+
+The Linux runner creates a local Wine prefix at:
+
+```text
+.wineprefix/
+```
+
+This folder is ignored by Git.
 
 ## Logs
 
