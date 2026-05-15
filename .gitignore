@@ -1,0 +1,33 @@
+# Runtime logs
+Logs/*
+!Logs/.gitkeep
+
+# Runtime temp files
+Temp/*
+!Temp/.gitkeep
+
+# Local tool copies / fake drive content
+Drives/S/*
+!Drives/S/.gitkeep
+
+Drives/W/*
+!Drives/W/Windows/
+Drives/W/Windows/*
+!Drives/W/Windows/.gitkeep
+
+Drives/Z/*
+!Drives/Z/.gitkeep
+
+# Deployment artifacts
+*.wim
+*.esd
+*.swm
+*.iso
+*.vhd
+*.vhdx
+
+# Windows junk
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+System Volume Information/
