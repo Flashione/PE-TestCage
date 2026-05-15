@@ -10,13 +10,13 @@ set "TMP=%CAGE%\Temp"
 set "LOGDIR=%CAGE%\Logs"
 
 if "%~1"=="" (
-    set "PROFILE=%CAGE%\profiles\dp-menu.cmd"
+    set "TARGET="
 ) else (
-    set "PROFILE=%~1"
+    set "TARGET=%~1"
 )
 
-if not exist "%PROFILE%" (
-    if exist "%CAGE%\%PROFILE%" set "PROFILE=%CAGE%\%PROFILE%"
+if not "%TARGET%"=="" (
+    if exist "%CAGE%\%TARGET%" set "TARGET=%CAGE%\%TARGET%"
 )
 
 mkdir "%TEMP%" 2>nul
@@ -33,34 +33,30 @@ echo.
 echo Cage root:
 echo %CAGE%
 echo.
-echo Profile:
-echo %PROFILE%
-echo.
 
-if not exist "%PROFILE%" (
-    echo ERROR: Profile not found.
+if not "%TARGET%"=="" (
+    echo Target script:
+    echo %TARGET%
     echo.
-    pause
-    exit /b 1
 )
 
 if exist S:\ (
     echo ERROR: Drive S: already exists.
-    echo Remove the drive mapping or adjust the cage profile.
+    echo Remove the drive mapping or adjust the cage configuration.
     pause
     exit /b 1
 )
 
 if exist W:\ (
     echo ERROR: Drive W: already exists.
-    echo Remove the drive mapping or adjust the cage profile.
+    echo Remove the drive mapping or adjust the cage configuration.
     pause
     exit /b 1
 )
 
 if exist Z:\ (
     echo ERROR: Drive Z: already exists.
-    echo Remove the drive mapping or adjust the cage profile.
+    echo Remove the drive mapping or adjust the cage configuration.
     pause
     exit /b 1
 )
@@ -87,8 +83,23 @@ echo Dangerous commands are mocked through:
 echo %MOCKBIN%
 echo.
 
-call "%PROFILE%"
+if "%TARGET%"=="" (
+    echo Starting interactive cage shell.
+    echo Type exit to close the cage.
+    echo.
+    cmd /k
+) else (
+    if not exist "%TARGET%" (
+        echo ERROR: Target script not found.
+        echo %TARGET%
+        echo.
+        goto CLOSE_CAGE
+    )
 
+    call "%TARGET%"
+)
+
+:CLOSE_CAGE
 echo.
 echo Closing PE-TestCage...
 
